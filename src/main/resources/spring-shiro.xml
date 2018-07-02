@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+         
+    <!-- 
+      1.配置securityManager
+   
+     --> 
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="cacheManager"/>
+        <!-- Single realm app.  If you have multiple realms, use the 'realms' property instead. -->
+        <property name="sessionManager" ref="sessionManager"/>
+        <property name="realm" ref="jdbcRealm"/>
+    </bean>
+
+
+    <!-- 会话管理器 -->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <property name="globalSessionTimeout" value="3600000"/><!-- 单位MS-->
+        <property name="sessionIdUrlRewritingEnabled" value="false" />
+        <property name="deleteInvalidSessions" value="true"/>
+        <property name="sessionValidationSchedulerEnabled" value="true"/>
+        <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/>
+        <property name="sessionDAO" ref="sessionDAO"/>
+        <property name="sessionIdCookieEnabled" value="true"/>
+        <property name="sessionIdCookie" ref="sessionIdCookie"/>
+        <property name ="sessionListeners">
+            <list>
+                <ref bean="shiroSessionListener"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- session监听 -->
+    <bean id="shiroSessionListener" class="com.yuansheng.resultful.util.shiro.listenter.ShiroSessionListener"/>
+
+    <!-- 会话DAO -->
+    <bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+        <property name="activeSessionsCacheName" value="activeSessionCache"/>
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
+    </bean>
+    <!-- 会话ID生成器  -->
+    <bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator"/>
+    <!-- 会话验证调度器 -->
+    <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler">
+        <property name="interval"  value="1800000"/><!-- 单位MS-->
+        <property name="sessionManager" ref="sessionManager"/>
+    </bean>
+
+    <!-- 会话Cookie模板 -->
+    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <constructor-arg name="name"  value="icolor.session.id"/>
+        <property name="httpOnly" value="true"/>
+        <property name="maxAge" value="180000"/><!-- 单位S-->
+    </bean>
+    <!-- 
+      2.配置cacheManager
+      2.1需要加入ehcache的jar和配置文件
+   
+     --> 
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/> 
+    </bean>
+         
+     <!-- 
+         3.配置Realm，可以把 Realm 看成 DataSource，即安全数据源
+     --> 
+    <bean id="jdbcRealm" class="com.yuansheng.resultful.util.shiro.token.MyRealm">
+        
+    </bean>
+            
+     <!-- 
+         4.配置org.apache.shiro.spring.LifecycleBeanPostProcessor，可以自定义来调整在spring Ioc容器中shiro bean的生命周期
+     --> 
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    
+     <!-- 
+         5.启用Ioc 容器中使用shiro的注解，但必须在配置了LifecycleBeanPostProcessor之后才可以使用
+     --> 
+    
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+     
+     
+     <bean id="LoginFormAuthenticationFilter" class="com.yuansheng.resultful.util.shiro.filter.LoginFormAuthenticationFilter "/> 
+    <!-- 
+         6.配置shiroFilter
+         6.1 id必须和web.xml中的DelegatingFilterProxy的<filter-name>里面的值一样
+     --> 
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- Shiro的核心安全接口,这个属性是必须的 -->  
+        <property name="securityManager" ref="securityManager"/>
+        <!-- 身份认证失败，则跳转到登录页面的配置 -->  
+        <property name="loginUrl" value="/user/loginpage"/>
+        <property name="successUrl" value="/user/index"/>
+        <!-- 权限认证失败，则跳转到指定页面 --> 
+        <property name="unauthorizedUrl" value="/login.jsp"/>
+        <!-- 
+                            配置哪些页面需要受保护
+                            以及访问这些页面需要的权限
+            1.anon可以被匿名访问
+            2.authc必须被认证（即登录）后才可能访问的页面使用 FormAuthenticationFilter拦截器
+        
+        -->
+        <!-- 自定义filter配置 -->  
+        <property name="filters">  
+            <map>  
+                <!-- 将自定义 的FormAuthenticationFilter注入shiroFilter中 -->  
+                <entry key="authc" value-ref="LoginFormAuthenticationFilter" />  
+            </map>  
+        </property> 
+        
+        <!-- /user/index = authc
+                /order/* = authc -->
+                
+        <property name="filterChainDefinitions">
+            <value>               
+                /css/** = anon  
+                /fonts/** = anon  
+                /styles/** = anon 
+                /js/** = anon 
+                /lib/** = anon 
+                /images/** = anon 
+                <!-- 验证码，可匿名访问 -->
+                /user/getVCode = anon
+                <!-- 登录请求，可匿名访问 -->
+                /user/login= anon
+                
+                
+                /**=authc
+            </value>
+        </property>
+    </bean>
+
+</beans>

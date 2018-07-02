@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd"
+	default-lazy-init="false">
+
+	<!-- jedis连接池配置对象 -->	
+	 <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}" /><!-- 最大闲置 -->
+        <property name="maxTotal" value="${redis.maxActive}" />
+         <property name="minIdle" value="${redis.minIdle}" />
+<!--        <property name="testOnReturn" value="true"/>-->
+    </bean>
+    
+	<!-- redis服务器中心   jedis连接工厂，生成连接对象 -->
+    <bean id="connectionFactory"
+        class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="poolConfig" ref="jedisPoolConfig" />
+        <property name="port" value="${redis.port}" />
+        <property name="hostName" value="${redis.host}" />
+        <property name="password" value="${redis.pass}" />
+        <property name="timeout" value="${redis.timeout}"/>
+</bean>
+
+        <!-- 配置RedisTemplate
+        RedisTemplate 对 RedisConnection 进行了封装。提供连接管理，序列化等功能，它对 Redis 的交互进行了更高层次的抽象，极大的方便和简化了 Redis 的操作-->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+
+    <!-- 配置RedisCacheManager   
+                   做为 redis 统一的调度和管理者-->
+    <bean id="redisCacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
+        <constructor-arg name="redisOperations" ref="redisTemplate"/>
+        <property name="defaultExpiration" value="${redis.expiration}"/>
+    </bean>
+
+    <!-- 配置RedisCacheConfig 
+         RedisCacheConfig extends org.springframework.cache.annotation.CachingConfigurerSupport，自定义redis的key生成规则，如果不在注解参数中注明key=“”的话，就采用这个类中的key生成规则生成key
+         自定义
+    -->
+    <bean id="redisCacheConfig" class="com.yuansheng.resultful.util.rediscache.RedisCacheConfig">
+        <constructor-arg ref="connectionFactory"/>
+        <constructor-arg ref="redisTemplate"/>
+        <constructor-arg ref="redisCacheManager"/>
+    </bean>
+</beans>
