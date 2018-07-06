@@ -14,6 +14,9 @@
 
 	<context:property-placeholder location="classpath:config.properties,classpath:redis.properties" />
 
+	<import resource="spring-shiro.xml"/>
+	<import resource="kaptcha.xml"/>
+	<import resource="spring-cache.xml"/>
 
 	<!-- 配置数据源 使用的是Druid数据源 -->
 	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
@@ -96,13 +99,6 @@
 	<!-- enable transaction annotation support -->
 	<!-- 使用全注释事务 -->
 	<tx:annotation-driven transaction-manager="txManager" />
-
-
-    <import resource="spring-shiro.xml"/>
-    <import resource="kaptcha.xml"/>
-    <import resource="spring-cache.xml"/>
-    
-    
 	<!-- 异常处理类 -->
 	<!-- <bean id="handlerExceptionResolver" class="com.zwu.core.exception.WebApplicationException" 
 		/> -->
