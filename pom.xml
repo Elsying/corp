@@ -49,18 +49,21 @@
 			<artifactId>spring-jdbc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-		</dependency>
-		<!-- mybaits -->
+			<!--上述scope配置了Junit可用的位置，test表示只能在src下的test文件夹下面才可以使用-->
+		    <!--<scope>test</scope>-->
+            <version>4.12</version>
+    </dependency>
+
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+    <!-- mybaits -->
 		<!-- mybatis自动生成mapper https://mvnrepository.com/artifact/org.mybatis.generator/mybatis-generator-core -->
 	<dependency>
 		<groupId>org.mybatis.generator</groupId>
@@ -218,11 +221,19 @@
 			<artifactId>javase</artifactId>
 			<version>3.3.3</version>
 		</dependency>
+		<!-- selenium测试工具  这个包有点多 测试用 也可以删。。。。。。 -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-aop</artifactId>
-			<version>4.0.2.RELEASE</version>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>RELEASE</version>
+			<scope>compile</scope>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
 
 

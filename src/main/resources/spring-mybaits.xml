@@ -79,7 +79,11 @@
             </array>
         </property>	 
 	</bean>
-
+    <!--
+	<bean id="RedisMybatisCache" class="com.yuansheng.resultful.util.rediscache.cacahe.RedisMybatisCache">
+		<constructor-arg value=""/>
+	</bean>
+	-->
 
 	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"
 		scope="prototype">
@@ -111,4 +115,6 @@
 		path="/userSet/userAgreement.jspa" /> <mvc:exclude-mapping path="/userSet/findPwd.jspa" 
 		/> <bean class="com.zwu.control.web.interceptor.WebApplicationLoginInterceptor"/> 
 		</mvc:interceptor> </mvc:interceptors> -->
+	<!-- 静态获取Bean -->
+
 </beans>

@@ -1,7 +1,5 @@
 package com.yuansheng.resultful.util.rediscache.cacahe;
 
-
-
 import com.yuansheng.resultful.util.SerializeUtil;
 import org.apache.ibatis.cache.Cache;
 import org.slf4j.Logger;
@@ -13,6 +11,8 @@ import org.springframework.data.redis.connection.jedis.JedisConnection;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import javax.annotation.Resource;
@@ -23,13 +23,25 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
     mybatis的二级缓存，一级默认缓存
  */
+
 public class RedisMybatisCache implements Cache {
     private static final Logger logger = LoggerFactory.getLogger(RedisMybatisCache.class);
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+
+    //@Resource
+    private static RedisTemplate<String, Object> redisTemplate;
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final String id;
+
+
+    /**
+     因为mybatis创建缓存实例是由自己创建的不是spring所以不能用@Resouce注解自动装配
+     这里使用中间类RedisCacheTransfer静态注入RedisTemplate实例
+     */
+    public static void setaRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+        RedisMybatisCache.redisTemplate=redisTemplate;
+    }
+
 
 
     public RedisMybatisCache(final String id) {

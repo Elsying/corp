@@ -8,6 +8,8 @@ import java.io.*;
  */
 @SuppressWarnings("unchecked")
 public class SerializeUtil {
+
+
     public static byte[] serialize(Object value) {
         if (value == null) {
             throw new NullPointerException("Can't serialize null");

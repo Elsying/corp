@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 public class CustomCacheManager implements CacheManager,Destroyable {
     @Resource(name = "redisShiroCache")
     private RedisShiroCache redisShiroCache;
+
     @Override
     public <K, V> Cache<K, V> getCache(String name) throws CacheException {
         //根据缓存名字获取一个Cache,这简单的写了....

@@ -62,4 +62,9 @@
        <constructor-arg ref="redisCacheManager"/>
    </bean>
     -->
+    <!-- 使用中间类解决RedisCache.jedisConnectionFactory的静态注入，从而使MyBatis实现第三方缓存 -->
+    <bean id="redisCacheTransfer" class="com.yuansheng.resultful.util.rediscache.cacahe.RedisCacheTransfer">
+        <property name="RedisTemplate" ref="redisTemplate"/>
+
+    </bean>
 </beans>

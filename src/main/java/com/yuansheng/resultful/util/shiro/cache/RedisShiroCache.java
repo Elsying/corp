@@ -1,7 +1,6 @@
 package com.yuansheng.resultful.util.shiro.cache;
 
 import com.yuansheng.resultful.util.SerializeUtil;
-import com.yuansheng.resultful.util.SpringContextUtil;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;

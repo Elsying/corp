@@ -6,11 +6,13 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 
 /*
  * redis自定义的工具类，自定义redis的key生成规则
  */
+
 public class RedisCacheConfig extends CachingConfigurerSupport  {
 	private volatile JedisConnectionFactory mJedisConnectionFactory;
     private volatile RedisTemplate<String, String> mRedisTemplate;
